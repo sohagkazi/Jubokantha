@@ -88,6 +88,7 @@ export default function DonationsPage() {
       'Recurring': ''
     });
 
+    // @ts-ignore
     const worksheet = XLSX.utils.json_to_sheet(exportData, { origin: "A3" });
     XLSX.utils.sheet_add_aoa(worksheet, title, { origin: "A1" });
     

@@ -1,4 +1,6 @@
+"use client"
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 import { ShieldCheck } from "lucide-react"
 import { Translate } from "@/components/Translate"
 
@@ -30,6 +32,12 @@ const LinkedinIcon = ({ size = 24, ...props }) => (
 )
 
 export function Footer() {
+  const pathname = usePathname();
+  
+  if (pathname.startsWith('/admin') || pathname.startsWith('/dashboard')) {
+    return null;
+  }
+
   return (
     <footer className="bg-white border-t border-border pt-16">
       <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
