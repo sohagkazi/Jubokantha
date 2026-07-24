@@ -12,7 +12,8 @@ import {
   HeartHandshake, 
   LogOut,
   Menu,
-  X
+  X,
+  ShieldCheck
 } from 'lucide-react';
 import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
 import { app } from '@/lib/firebase';
@@ -68,6 +69,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { name: 'HR & Payroll', href: '/admin/hr', icon: Users },
     { name: 'Volunteers', href: '/admin/volunteers', icon: Users },
     { name: 'Finance', href: '/admin/finance', icon: Wallet },
+    { name: 'User Management', href: '/admin/users', icon: ShieldCheck },
   ];
 
   return (
