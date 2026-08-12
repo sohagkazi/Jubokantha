@@ -17,6 +17,7 @@ import {
   getDownloadURL, 
   deleteObject 
 } from "firebase/storage";
+import { getApiUrl } from "./utils";
 
 // Types
 export interface NewsItem {
@@ -41,11 +42,29 @@ export interface SiteSettings {
   bannerSubtitle?: string;
 }
 
-// Upload helper
-export async function uploadImage(file: File, path: string): Promise<string> {
-  const storageRef = ref(storage, `${path}/${Date.now()}_${file.name}`);
-  await uploadBytes(storageRef, file);
-  return await getDownloadURL(storageRef);
+// Upload helper — saves to web hosting server's public/uploads directory
+export async function uploadImage(file: File, pathPrefix?: string): Promise<string> {
+  const formData = new FormData();
+  formData.append('file', file);
+  if (pathPrefix) {
+    formData.append('path', pathPrefix);
+  }
+
+  const res = await fetch(getApiUrl('/api/upload'), {
+    method: 'POST',
+    body: formData
+  });
+
+  if (!res.ok) {
+    throw new Error('Upload failed');
+  }
+
+  const data = await res.json();
+  if (!data.success) {
+    throw new Error(data.error || 'Upload failed');
+  }
+
+  return data.url;
 }
 
 // Settings (Theme & Banner)

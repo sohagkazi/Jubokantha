@@ -107,6 +107,14 @@ export function Footer() {
           </div>
         </div>
       </div>
+      
+      <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-2 pb-8 border-t border-gray-100 pt-8">
+         <div className="flex flex-col items-center justify-center space-y-4">
+            <h3 className="font-bold text-gray-400 text-xs tracking-widest uppercase"><Translate>পেমেন্ট পার্টনার</Translate></h3>
+            <img src="/eps-banner.png" alt="Pay with EPS" className="max-w-full h-auto max-h-16 object-contain grayscale hover:grayscale-0 transition-all duration-300" />
+         </div>
+      </div>
+
       <div className="bg-[#f4f7fb] py-4 border-t border-gray-200">
         <div className="container mx-auto flex flex-col items-center justify-center space-y-2">
            <div className="flex items-center space-x-2 text-xs text-gray-600">

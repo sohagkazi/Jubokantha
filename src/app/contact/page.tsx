@@ -1,5 +1,4 @@
 "use client"
-import { OtherWaysToDonate } from "@/components/other-ways-to-donate"
 import { Translate, useTranslateText } from "@/components/Translate"
 
 export default function ContactPage() {
@@ -68,7 +67,7 @@ export default function ContactPage() {
       </main>
 
       {/* Other ways to donate */}
-      <OtherWaysToDonate />
+
     </div>
   )
 }

@@ -1,17 +1,37 @@
 "use client"
 import { useState } from "react"
+import { getApiUrl } from "@/lib/utils"
 import { collection, addDoc, serverTimestamp } from "firebase/firestore"
 import { db } from "@/lib/firebase"
+import { useSearchParams } from "next/navigation"
+import { useEffect } from "react"
 import { Translate, useTranslateText } from "@/components/Translate"
-
 export function DonationForm() {
   const [formData, setFormData] = useState({
     fund: "সাধারণ তহবিল",
     name: "",
     mobile: "",
-    amount: ""
+    amount: "",
+    currency: "BDT"
   })
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle")
+  const searchParams = useSearchParams()
+  const paymentStatus = searchParams?.get("payment")
+
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error" | "cancelled">("idle")
+
+  useEffect(() => {
+    if (paymentStatus === "success") {
+      setStatus("success")
+      setTimeout(() => setStatus("idle"), 5000)
+    } else if (paymentStatus === "fail" || paymentStatus === "error") {
+      setStatus("error")
+      setTimeout(() => setStatus("idle"), 5000)
+    } else if (paymentStatus === "cancel") {
+      setStatus("cancelled")
+      setTimeout(() => setStatus("idle"), 5000)
+    }
+  }, [paymentStatus])
+
 
   const namePlaceholder = useTranslateText("আপনার নাম")
   const mobilePlaceholder = useTranslateText("মোবাইল নম্বর")
@@ -19,6 +39,8 @@ export function DonationForm() {
   const optHealthFund = useTranslateText("স্বাস্থ্য তহবিল")
   const optEducationFund = useTranslateText("শিক্ষা তহবিল")
   const optServiceFund = useTranslateText("সেবা তহবিল")
+  const optTaka = useTranslateText("টাকা (৳)")
+  const optDollar = useTranslateText("ডলার ($)")
 
   const handleSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault()
@@ -26,24 +48,37 @@ export function DonationForm() {
     
     setStatus("loading")
     try {
-      await addDoc(collection(db, "donations"), {
-        ...formData,
-        createdAt: serverTimestamp()
-      })
-      setStatus("success")
-      setFormData({ fund: "সাধারণ তহবিল", name: "", mobile: "", amount: "" })
-      setTimeout(() => setStatus("idle"), 5000)
+      const response = await fetch(getApiUrl('/api/eps/initiate'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to initiate payment');
+      }
+
+      if (data.redirectUrl) {
+        window.location.href = data.redirectUrl;
+      } else {
+        throw new Error('No redirect URL returned');
+      }
     } catch (error) {
       console.error("Error submitting donation:", error)
       setStatus("error")
     }
   }
 
-  const predefinedAmounts = ["100", "500", "1000", "5000"]
+  const predefinedAmounts = formData.currency === "BDT" ? ["100", "500", "1000", "5000"] : ["10", "50", "100", "500"]
+  const currencySymbol = formData.currency === "BDT" ? "৳" : "$"
 
   return (
     <div className="bg-[#EBF3FA] rounded-xl p-8 shadow-md border border-blue-100">
-       <h2 className="text-2xl font-bold text-primary text-center mb-6"><Translate>যুবকণ্ঠ ফাউন্ডেশনকে অনুদান দিন</Translate></h2>
+       <h2 className="text-2xl font-bold text-primary text-center mb-6"><Translate>যুবকণ্ঠ সোসাইটিকে অনুদান দিন</Translate></h2>
        
        {status === "success" && (
          <div className="mb-6 p-4 bg-green-50 text-green-700 border border-green-200 rounded text-center font-semibold">
@@ -52,12 +87,28 @@ export function DonationForm() {
        )}
        {status === "error" && (
          <div className="mb-6 p-4 bg-red-50 text-red-700 border border-red-200 rounded text-center font-semibold">
-            <Translate>দুঃখিত, কোনো একটি সমস্যা হয়েছে। দয়া করে আবার চেষ্টা করুন।</Translate>
+            <Translate>দুঃখিত, কোনো একটি সমস্যা হয়েছে বা পেমেন্ট ব্যর্থ হয়েছে। দয়া করে আবার চেষ্টা করুন।</Translate>
+         </div>
+       )}
+       {status === "cancelled" && (
+         <div className="mb-6 p-4 bg-yellow-50 text-yellow-700 border border-yellow-200 rounded text-center font-semibold">
+            <Translate>আপনি পেমেন্ট বাতিল করেছেন।</Translate>
          </div>
        )}
 
        <form onSubmit={handleSubmit}>
          <div className="flex flex-col md:flex-row gap-4 items-center mb-6">
+            <div className="flex-1 w-full">
+              <label className="text-sm font-semibold text-gray-600 mb-1 block"><Translate>মুদ্রা</Translate> *</label>
+              <select 
+                className="w-full bg-white border border-gray-300 rounded p-2 text-sm text-gray-700"
+                value={formData.currency}
+                onChange={(e) => setFormData({...formData, currency: e.target.value, amount: ''})}
+              >
+                <option value="BDT">{optTaka}</option>
+                <option value="USD">{optDollar}</option>
+              </select>
+            </div>
             <div className="flex-1 w-full">
               <label className="text-sm font-semibold text-gray-600 mb-1 block"><Translate>তহবিল</Translate> *</label>
               <select 
@@ -85,11 +136,14 @@ export function DonationForm() {
             <div className="flex-1 w-full">
               <label className="text-sm font-semibold text-gray-600 mb-1 block"><Translate>মোবাইল</Translate> *</label>
               <input 
-                type="text" 
+                type="tel" 
                 placeholder={mobilePlaceholder}
                 className="w-full bg-white border border-gray-300 rounded p-2 text-sm text-gray-700"
                 value={formData.mobile}
-                onChange={(e) => setFormData({...formData, mobile: e.target.value})}
+                onChange={(e) => {
+                  const val = e.target.value.replace(/\D/g, '');
+                  setFormData({...formData, mobile: val});
+                }}
                 required
               />
             </div>
@@ -107,7 +161,7 @@ export function DonationForm() {
                     : "bg-white text-[#00BCD4] border border-[#00BCD4] hover:bg-gray-50"
                 }`}
               >
-                ৳ {amt}
+                {currencySymbol} {amt}
               </button>
             ))}
             

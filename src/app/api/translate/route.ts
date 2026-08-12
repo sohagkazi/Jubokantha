@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
     }
 
     const response = await ai.models.generateContent({
-      model: 'gemini-3.5-flash',
+      model: 'gemini-3.5-flash-lite',
       contents: prompt,
       config: {
         systemInstruction: isBatch 
@@ -62,8 +62,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ translatedText });
     }
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Translation error:', error);
-    return NextResponse.json({ error: 'Failed to translate' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to translate', details: error?.message || String(error) }, { status: 500 });
   }
 }

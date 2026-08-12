@@ -1,0 +1,1 @@
+import ftplib; ftp = ftplib.FTP('server214.web-hosting.com'); ftp.login('piectvoy', 'BsNNmUm3CIoa'); ftp.cwd('jubokantha-app'); f = open('app.js', 'rb'); ftp.storbinary('STOR app.js', f); f.close(); ftp.quit(); print('app.js uploaded successfully.')

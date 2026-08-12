@@ -1,14 +1,16 @@
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { DonationForm } from "@/components/donation-form"
+import { Suspense } from "react"
 import { Translate } from "@/components/Translate"
-
 export default function DonatePage() {
   return (
     <div className="flex flex-col min-h-screen bg-gray-50 pt-8 pb-0">
       {/* Quick Donation Section */}
       <section className="max-w-5xl mx-auto relative z-10 w-full px-4 mb-16">
-        <DonationForm />
+        <Suspense fallback={<div>Loading form...</div>}>
+          <DonationForm />
+        </Suspense>
       </section>
 
       {/* Activities/Projects Grid */}
@@ -44,59 +46,6 @@ export default function DonatePage() {
               </div>
             ))}
          </div>
-      </section>
-
-       {/* Other Ways to Donate */}
-      <section className="bg-gray-100 py-16">
-        <div className="max-w-5xl mx-auto px-4">
-           <h2 className="text-2xl font-bold text-gray-800 text-center mb-10"><Translate>অনুদানের অন্যান্য উপায়</Translate></h2>
-           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-              <div className="bg-white p-6 rounded shadow-sm border border-gray-200">
-                <div className="w-16 h-16 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-2xl font-bold">৳</span>
-                </div>
-                <h3 className="font-bold text-lg mb-4 text-black"><Translate>শিক্ষা</Translate></h3>
-                <p className="text-sm font-semibold text-gray-600 mb-2"><Translate>ব্যাংক অ্যাকাউন্ট</Translate></p>
-                <div className="text-xs text-gray-600 space-y-1">
-                  <p>Pubali Bank PLC</p>
-                  <p>Acc Name: JUBOKANTHA Society</p>
-                  <p>Acc No: 2584901020126</p>
-                  <p>ELEPHANT ROAD Branch</p>
-                  <p>SWIFT Code: PUBABDDH</p>
-                  <p>Routing Number: 175261332</p>
-                </div>
-              </div>
-              <div className="bg-white p-6 rounded shadow-sm border border-gray-200">
-                <div className="w-16 h-16 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-2xl font-bold">%</span>
-                </div>
-                <h3 className="font-bold text-lg mb-4 text-black"><Translate>স্বাস্থ্য</Translate></h3>
-                <p className="text-sm font-semibold text-gray-600 mb-2"><Translate>ব্যাংক অ্যাকাউন্ট</Translate></p>
-                <div className="text-xs text-gray-600 space-y-1">
-                  <p>Islami Bank PLC</p>
-                  <p>Acc Name: JUBOKANTHA Society</p>
-                  <p>Acc No: 20502050204462112</p>
-                  <p>Dhanmondi Branch</p>
-                  <p>SWIFT Code: IBBLBDDH</p>
-                  <p>Routing Number: 125261182</p>
-                </div>
-              </div>
-              <div className="bg-white p-6 rounded shadow-sm border border-gray-200">
-                <div className="w-16 h-16 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-2xl font-bold">📱</span>
-                </div>
-                <h3 className="font-bold text-lg mb-4 text-black"><Translate>অন্যান্য অপশন</Translate></h3>
-                <p className="text-sm font-semibold text-gray-600 mb-2"><Translate>অনলাইনে প্রদান করুন</Translate></p>
-                <Button className="bg-primary hover:bg-primary/90 text-white text-xs mb-4"><Translate>এখানে দান করুন</Translate></Button>
-                <div className="text-xs text-gray-600 space-y-1">
-                  <p>BKASH (Payment): 01730482278</p>
-                  <p>NAGAD (Payment): 01730482279</p>
-                  <p>Bkash (Send Money): 01730482280</p>
-                  <p>Rocket (Send Money): 016747470160</p>
-                </div>
-              </div>
-           </div>
-        </div>
       </section>
     </div>
   )

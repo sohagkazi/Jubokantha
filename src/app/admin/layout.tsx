@@ -13,7 +13,8 @@ import {
   LogOut,
   Menu,
   X,
-  ShieldCheck
+  ShieldCheck,
+  ImageIcon
 } from 'lucide-react';
 import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
 import { app } from '@/lib/firebase';
@@ -65,9 +66,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const navItems = [
     { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
     { name: 'Donations', href: '/admin/donations', icon: HeartHandshake },
-    { name: 'Projects', href: '/admin/projects', icon: Briefcase },
+    { name: 'Our Projects and Activities', href: '/admin/projects', icon: Briefcase },
+    { name: 'Our Campaigns', href: '/admin/campaigns', icon: Briefcase },
     { name: 'HR & Payroll', href: '/admin/hr', icon: Users },
+    { name: 'Members', href: '/admin/members', icon: Users },
+    { name: 'Executive Committee', href: '/admin/committee', icon: Users },
     { name: 'Volunteers', href: '/admin/volunteers', icon: Users },
+    { name: 'Gallery', href: '/admin/gallery', icon: ImageIcon },
     { name: 'Finance', href: '/admin/finance', icon: Wallet },
     { name: 'User Management', href: '/admin/users', icon: ShieldCheck },
   ];

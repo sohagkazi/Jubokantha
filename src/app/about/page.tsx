@@ -20,7 +20,7 @@ export default function AboutPage() {
             <div className="prose prose-lg max-w-none text-gray-700">
               <h2 className="text-2xl font-bold text-gray-800 mb-4"><Translate>আমাদের পথচলা</Translate></h2>
               <p className="mb-4 leading-relaxed">
-                <Translate>যুবকণ্ঠ ফাউন্ডেশন একটি স্বেচ্ছাসেবী, অলাভজনক এবং অরাজনৈতিক দাতব্য সংস্থা। ২০০৭ সাল থেকে আমরা বাংলাদেশের আনাচে-কানাচে অসহায় ও সুবিধা বঞ্চিত মানুষের পাশে দাঁড়িয়েছি। আমাদের মূল লক্ষ্য হলো দারিদ্র্য বিমোচন, শিক্ষা, স্বাস্থ্যসেবা এবং কর্মসংস্থানের মাধ্যমে একটি স্বনির্ভর সমাজ গড়ে তোলা।</Translate>
+                <Translate>যুবকণ্ঠ সোসাইটি একটি স্বেচ্ছাসেবী, অলাভজনক এবং অরাজনৈতিক দাতব্য সংস্থা। ২০০৭ সাল থেকে আমরা বাংলাদেশের আনাচে-কানাচে অসহায় ও সুবিধা বঞ্চিত মানুষের পাশে দাঁড়িয়েছি। আমাদের মূল লক্ষ্য হলো দারিদ্র্য বিমোচন, শিক্ষা, স্বাস্থ্যসেবা এবং কর্মসংস্থানের মাধ্যমে একটি স্বনির্ভর সমাজ গড়ে তোলা।</Translate>
               </p>
               <h2 className="text-2xl font-bold text-gray-800 mt-8 mb-4"><Translate>আমাদের লক্ষ্য (Vision)</Translate></h2>
               <p className="mb-4 leading-relaxed">

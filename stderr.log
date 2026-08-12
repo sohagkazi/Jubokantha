@@ -1,0 +1,359 @@
+internal/modules/cjs/loader.js:934
+  throw err;
+  ^
+
+Error: Cannot find module 'next'
+Require stack:
+- /home/piectvoy/jubokantha-app/server.js
+- /usr/local/lsws/fcgi-bin/lsnode.js
+    at Function.Module._resolveFilename (internal/modules/cjs/loader.js:931:15)
+    at Function.Module._load (internal/modules/cjs/loader.js:774:27)
+    at Module.require (internal/modules/cjs/loader.js:1003:19)
+    at require (internal/modules/cjs/helpers.js:118:18)
+    at Object.<anonymous> (/home/piectvoy/jubokantha-app/server.js:16:1)
+    at Module._compile (internal/modules/cjs/loader.js:1114:14)
+    at Object.Module._extensions..js (internal/modules/cjs/loader.js:1143:10)
+    at Module.load (internal/modules/cjs/loader.js:979:32)
+    at Function.Module._load (internal/modules/cjs/loader.js:819:12)
+    at Module.require (internal/modules/cjs/loader.js:1003:19) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    '/home/piectvoy/jubokantha-app/server.js',
+    '/usr/local/lsws/fcgi-bin/lsnode.js'
+  ]
+}
+internal/modules/cjs/loader.js:934
+  throw err;
+  ^
+
+Error: Cannot find module 'next'
+Require stack:
+- /home/piectvoy/jubokantha-app/server.js
+- /usr/local/lsws/fcgi-bin/lsnode.js
+    at Function.Module._resolveFilename (internal/modules/cjs/loader.js:931:15)
+    at Function.Module._load (internal/modules/cjs/loader.js:774:27)
+    at Module.require (internal/modules/cjs/loader.js:1003:19)
+    at require (internal/modules/cjs/helpers.js:118:18)
+    at Object.<anonymous> (/home/piectvoy/jubokantha-app/server.js:16:1)
+    at Module._compile (internal/modules/cjs/loader.js:1114:14)
+    at Object.Module._extensions..js (internal/modules/cjs/loader.js:1143:10)
+    at Module.load (internal/modules/cjs/loader.js:979:32)
+    at Function.Module._load (internal/modules/cjs/loader.js:819:12)
+    at Module.require (internal/modules/cjs/loader.js:1003:19) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    '/home/piectvoy/jubokantha-app/server.js',
+    '/usr/local/lsws/fcgi-bin/lsnode.js'
+  ]
+}
+internal/modules/cjs/loader.js:934
+  throw err;
+  ^
+
+Error: Cannot find module 'next'
+Require stack:
+- /home/piectvoy/jubokantha-app/server.js
+- /usr/local/lsws/fcgi-bin/lsnode.js
+    at Function.Module._resolveFilename (internal/modules/cjs/loader.js:931:15)
+    at Function.Module._load (internal/modules/cjs/loader.js:774:27)
+    at Module.require (internal/modules/cjs/loader.js:1003:19)
+    at require (internal/modules/cjs/helpers.js:118:18)
+    at Object.<anonymous> (/home/piectvoy/jubokantha-app/server.js:16:1)
+    at Module._compile (internal/modules/cjs/loader.js:1114:14)
+    at Object.Module._extensions..js (internal/modules/cjs/loader.js:1143:10)
+    at Module.load (internal/modules/cjs/loader.js:979:32)
+    at Function.Module._load (internal/modules/cjs/loader.js:819:12)
+    at Module.require (internal/modules/cjs/loader.js:1003:19) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    '/home/piectvoy/jubokantha-app/server.js',
+    '/usr/local/lsws/fcgi-bin/lsnode.js'
+  ]
+}
+internal/modules/cjs/loader.js:934
+  throw err;
+  ^
+
+Error: Cannot find module 'next'
+Require stack:
+- /home/piectvoy/jubokantha-app/server.js
+- /usr/local/lsws/fcgi-bin/lsnode.js
+    at Function.Module._resolveFilename (internal/modules/cjs/loader.js:931:15)
+    at Function.Module._load (internal/modules/cjs/loader.js:774:27)
+    at Module.require (internal/modules/cjs/loader.js:1003:19)
+    at require (internal/modules/cjs/helpers.js:118:18)
+    at Object.<anonymous> (/home/piectvoy/jubokantha-app/server.js:16:1)
+    at Module._compile (internal/modules/cjs/loader.js:1114:14)
+    at Object.Module._extensions..js (internal/modules/cjs/loader.js:1143:10)
+    at Module.load (internal/modules/cjs/loader.js:979:32)
+    at Function.Module._load (internal/modules/cjs/loader.js:819:12)
+    at Module.require (internal/modules/cjs/loader.js:1003:19) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    '/home/piectvoy/jubokantha-app/server.js',
+    '/usr/local/lsws/fcgi-bin/lsnode.js'
+  ]
+}
+internal/modules/cjs/loader.js:934
+  throw err;
+  ^
+
+Error: Cannot find module 'next'
+Require stack:
+- /home/piectvoy/jubokantha-app/server.js
+- /usr/local/lsws/fcgi-bin/lsnode.js
+    at Function.Module._resolveFilename (internal/modules/cjs/loader.js:931:15)
+    at Function.Module._load (internal/modules/cjs/loader.js:774:27)
+    at Module.require (internal/modules/cjs/loader.js:1003:19)
+    at require (internal/modules/cjs/helpers.js:118:18)
+    at Object.<anonymous> (/home/piectvoy/jubokantha-app/server.js:16:1)
+    at Module._compile (internal/modules/cjs/loader.js:1114:14)
+    at Object.Module._extensions..js (internal/modules/cjs/loader.js:1143:10)
+    at Module.load (internal/modules/cjs/loader.js:979:32)
+    at Function.Module._load (internal/modules/cjs/loader.js:819:12)
+    at Module.require (internal/modules/cjs/loader.js:1003:19) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    '/home/piectvoy/jubokantha-app/server.js',
+    '/usr/local/lsws/fcgi-bin/lsnode.js'
+  ]
+}
+internal/modules/cjs/loader.js:934
+  throw err;
+  ^
+
+Error: Cannot find module 'next'
+Require stack:
+- /home/piectvoy/jubokantha-app/server.js
+- /usr/local/lsws/fcgi-bin/lsnode.js
+    at Function.Module._resolveFilename (internal/modules/cjs/loader.js:931:15)
+    at Function.Module._load (internal/modules/cjs/loader.js:774:27)
+    at Module.require (internal/modules/cjs/loader.js:1003:19)
+    at require (internal/modules/cjs/helpers.js:118:18)
+    at Object.<anonymous> (/home/piectvoy/jubokantha-app/server.js:16:1)
+    at Module._compile (internal/modules/cjs/loader.js:1114:14)
+    at Object.Module._extensions..js (internal/modules/cjs/loader.js:1143:10)
+    at Module.load (internal/modules/cjs/loader.js:979:32)
+    at Function.Module._load (internal/modules/cjs/loader.js:819:12)
+    at Module.require (internal/modules/cjs/loader.js:1003:19) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    '/home/piectvoy/jubokantha-app/server.js',
+    '/usr/local/lsws/fcgi-bin/lsnode.js'
+  ]
+}
+internal/modules/cjs/loader.js:934
+  throw err;
+  ^
+
+Error: Cannot find module 'next'
+Require stack:
+- /home/piectvoy/jubokantha-app/server.js
+- /usr/local/lsws/fcgi-bin/lsnode.js
+    at Function.Module._resolveFilename (internal/modules/cjs/loader.js:931:15)
+    at Function.Module._load (internal/modules/cjs/loader.js:774:27)
+    at Module.require (internal/modules/cjs/loader.js:1003:19)
+    at require (internal/modules/cjs/helpers.js:118:18)
+    at Object.<anonymous> (/home/piectvoy/jubokantha-app/server.js:16:1)
+    at Module._compile (internal/modules/cjs/loader.js:1114:14)
+    at Object.Module._extensions..js (internal/modules/cjs/loader.js:1143:10)
+    at Module.load (internal/modules/cjs/loader.js:979:32)
+    at Function.Module._load (internal/modules/cjs/loader.js:819:12)
+    at Module.require (internal/modules/cjs/loader.js:1003:19) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    '/home/piectvoy/jubokantha-app/server.js',
+    '/usr/local/lsws/fcgi-bin/lsnode.js'
+  ]
+}
+internal/modules/cjs/loader.js:934
+  throw err;
+  ^
+
+Error: Cannot find module 'next'
+Require stack:
+- /home/piectvoy/jubokantha-app/server.js
+- /usr/local/lsws/fcgi-bin/lsnode.js
+    at Function.Module._resolveFilename (internal/modules/cjs/loader.js:931:15)
+    at Function.Module._load (internal/modules/cjs/loader.js:774:27)
+    at Module.require (internal/modules/cjs/loader.js:1003:19)
+    at require (internal/modules/cjs/helpers.js:118:18)
+    at Object.<anonymous> (/home/piectvoy/jubokantha-app/server.js:16:1)
+    at Module._compile (internal/modules/cjs/loader.js:1114:14)
+    at Object.Module._extensions..js (internal/modules/cjs/loader.js:1143:10)
+    at Module.load (internal/modules/cjs/loader.js:979:32)
+    at Function.Module._load (internal/modules/cjs/loader.js:819:12)
+    at Module.require (internal/modules/cjs/loader.js:1003:19) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    '/home/piectvoy/jubokantha-app/server.js',
+    '/usr/local/lsws/fcgi-bin/lsnode.js'
+  ]
+}
+internal/modules/cjs/loader.js:934
+  throw err;
+  ^
+
+Error: Cannot find module 'next'
+Require stack:
+- /home/piectvoy/jubokantha-app/server.js
+- /usr/local/lsws/fcgi-bin/lsnode.js
+    at Function.Module._resolveFilename (internal/modules/cjs/loader.js:931:15)
+    at Function.Module._load (internal/modules/cjs/loader.js:774:27)
+    at Module.require (internal/modules/cjs/loader.js:1003:19)
+    at require (internal/modules/cjs/helpers.js:118:18)
+    at Object.<anonymous> (/home/piectvoy/jubokantha-app/server.js:16:1)
+    at Module._compile (internal/modules/cjs/loader.js:1114:14)
+    at Object.Module._extensions..js (internal/modules/cjs/loader.js:1143:10)
+    at Module.load (internal/modules/cjs/loader.js:979:32)
+    at Function.Module._load (internal/modules/cjs/loader.js:819:12)
+    at Module.require (internal/modules/cjs/loader.js:1003:19) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    '/home/piectvoy/jubokantha-app/server.js',
+    '/usr/local/lsws/fcgi-bin/lsnode.js'
+  ]
+}
+internal/modules/cjs/loader.js:934
+  throw err;
+  ^
+
+Error: Cannot find module 'next'
+Require stack:
+- /home/piectvoy/jubokantha-app/server.js
+- /usr/local/lsws/fcgi-bin/lsnode.js
+    at Function.Module._resolveFilename (internal/modules/cjs/loader.js:931:15)
+    at Function.Module._load (internal/modules/cjs/loader.js:774:27)
+    at Module.require (internal/modules/cjs/loader.js:1003:19)
+    at require (internal/modules/cjs/helpers.js:118:18)
+    at Object.<anonymous> (/home/piectvoy/jubokantha-app/server.js:16:1)
+    at Module._compile (internal/modules/cjs/loader.js:1114:14)
+    at Object.Module._extensions..js (internal/modules/cjs/loader.js:1143:10)
+    at Module.load (internal/modules/cjs/loader.js:979:32)
+    at Function.Module._load (internal/modules/cjs/loader.js:819:12)
+    at Module.require (internal/modules/cjs/loader.js:1003:19) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    '/home/piectvoy/jubokantha-app/server.js',
+    '/usr/local/lsws/fcgi-bin/lsnode.js'
+  ]
+}
+internal/modules/cjs/loader.js:934
+  throw err;
+  ^
+
+Error: Cannot find module 'next'
+Require stack:
+- /home/piectvoy/jubokantha-app/server.js
+- /usr/local/lsws/fcgi-bin/lsnode.js
+    at Function.Module._resolveFilename (internal/modules/cjs/loader.js:931:15)
+    at Function.Module._load (internal/modules/cjs/loader.js:774:27)
+    at Module.require (internal/modules/cjs/loader.js:1003:19)
+    at require (internal/modules/cjs/helpers.js:118:18)
+    at Object.<anonymous> (/home/piectvoy/jubokantha-app/server.js:16:1)
+    at Module._compile (internal/modules/cjs/loader.js:1114:14)
+    at Object.Module._extensions..js (internal/modules/cjs/loader.js:1143:10)
+    at Module.load (internal/modules/cjs/loader.js:979:32)
+    at Function.Module._load (internal/modules/cjs/loader.js:819:12)
+    at Module.require (internal/modules/cjs/loader.js:1003:19) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    '/home/piectvoy/jubokantha-app/server.js',
+    '/usr/local/lsws/fcgi-bin/lsnode.js'
+  ]
+}
+internal/modules/cjs/loader.js:934
+  throw err;
+  ^
+
+Error: Cannot find module 'next'
+Require stack:
+- /home/piectvoy/jubokantha-app/server.js
+- /usr/local/lsws/fcgi-bin/lsnode.js
+    at Function.Module._resolveFilename (internal/modules/cjs/loader.js:931:15)
+    at Function.Module._load (internal/modules/cjs/loader.js:774:27)
+    at Module.require (internal/modules/cjs/loader.js:1003:19)
+    at require (internal/modules/cjs/helpers.js:118:18)
+    at Object.<anonymous> (/home/piectvoy/jubokantha-app/server.js:16:1)
+    at Module._compile (internal/modules/cjs/loader.js:1114:14)
+    at Object.Module._extensions..js (internal/modules/cjs/loader.js:1143:10)
+    at Module.load (internal/modules/cjs/loader.js:979:32)
+    at Function.Module._load (internal/modules/cjs/loader.js:819:12)
+    at Module.require (internal/modules/cjs/loader.js:1003:19) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    '/home/piectvoy/jubokantha-app/server.js',
+    '/usr/local/lsws/fcgi-bin/lsnode.js'
+  ]
+}
+TypeError: features.toSorted is not a function
+    at Server.<anonymous> (../../../usr/local/lsws/fcgi-bin/lsnode.js:104:16)
+TypeError: features.toSorted is not a function
+    at Server.<anonymous> (../../../usr/local/lsws/fcgi-bin/lsnode.js:104:16)
+TypeError: features.toSorted is not a function
+    at Server.<anonymous> (../../../usr/local/lsws/fcgi-bin/lsnode.js:104:16)
+TypeError: features.toSorted is not a function
+    at Server.<anonymous> (../../../usr/local/lsws/fcgi-bin/lsnode.js:104:16)
+TypeError: features.toSorted is not a function
+    at Server.<anonymous> (../../../usr/local/lsws/fcgi-bin/lsnode.js:104:16)
+TypeError: features.toSorted is not a function
+    at Server.<anonymous> (../../../usr/local/lsws/fcgi-bin/lsnode.js:104:16)
+TypeError: features.toSorted is not a function
+    at Server.<anonymous> (../../../usr/local/lsws/fcgi-bin/lsnode.js:104:16)
+TypeError: features.toSorted is not a function
+    at Server.<anonymous> (../../../usr/local/lsws/fcgi-bin/lsnode.js:104:16)
+TypeError: features.toSorted is not a function
+    at Server.<anonymous> (../../../usr/local/lsws/fcgi-bin/lsnode.js:104:16)
+TypeError: features.toSorted is not a function
+    at Server.<anonymous> (../../../usr/local/lsws/fcgi-bin/lsnode.js:104:16)
+TypeError: features.toSorted is not a function
+    at Server.<anonymous> (../../../usr/local/lsws/fcgi-bin/lsnode.js:104:16)
+TypeError: features.toSorted is not a function
+    at Server.<anonymous> (../../../usr/local/lsws/fcgi-bin/lsnode.js:104:16)
+TypeError: features.toSorted is not a function
+    at Server.<anonymous> (../../../usr/local/lsws/fcgi-bin/lsnode.js:104:16)
+TypeError: features.toSorted is not a function
+    at Server.<anonymous> (../../../usr/local/lsws/fcgi-bin/lsnode.js:104:16)
+TypeError: features.toSorted is not a function
+    at Server.<anonymous> (../../../usr/local/lsws/fcgi-bin/lsnode.js:104:16)
+TypeError: features.toSorted is not a function
+    at Server.<anonymous> (../../../usr/local/lsws/fcgi-bin/lsnode.js:104:16)
+TypeError: features.toSorted is not a function
+    at Server.<anonymous> (../../../usr/local/lsws/fcgi-bin/lsnode.js:104:16)
+TypeError: features.toSorted is not a function
+    at Server.<anonymous> (../../../usr/local/lsws/fcgi-bin/lsnode.js:104:16)
+TypeError: features.toSorted is not a function
+    at Server.<anonymous> (../../../usr/local/lsws/fcgi-bin/lsnode.js:104:16)
+TypeError: features.toSorted is not a function
+    at Server.<anonymous> (../../../usr/local/lsws/fcgi-bin/lsnode.js:104:16)
+TypeError: features.toSorted is not a function
+    at Server.<anonymous> (../../../usr/local/lsws/fcgi-bin/lsnode.js:104:16)
+TypeError: features.toSorted is not a function
+    at Server.<anonymous> (../../../usr/local/lsws/fcgi-bin/lsnode.js:104:16)
+Error: Failed to find Server Action "x". This request might be from an older or newer deployment.
+Read more: https://nextjs.org/docs/messages/failed-to-find-server-action
+    at ignore-listed frames
+Error: Failed to find Server Action "x". This request might be from an older or newer deployment.
+Read more: https://nextjs.org/docs/messages/failed-to-find-server-action
+    at ignore-listed frames
+Error: Failed to find Server Action "x". This request might be from an older or newer deployment.
+Read more: https://nextjs.org/docs/messages/failed-to-find-server-action
+    at ignore-listed frames
+Error: Failed to find Server Action "x". This request might be from an older or newer deployment.
+Read more: https://nextjs.org/docs/messages/failed-to-find-server-action
+    at ignore-listed frames
+Error: Failed to find Server Action "x". This request might be from an older or newer deployment.
+Read more: https://nextjs.org/docs/messages/failed-to-find-server-action
+    at ignore-listed frames
+Error: Failed to find Server Action "x". This request might be from an older or newer deployment.
+Read more: https://nextjs.org/docs/messages/failed-to-find-server-action
+    at ignore-listed frames
+Error: Failed to find Server Action "x". This request might be from an older or newer deployment.
+Read more: https://nextjs.org/docs/messages/failed-to-find-server-action
+    at ignore-listed frames
+Error: Failed to find Server Action "x". This request might be from an older or newer deployment.
+Read more: https://nextjs.org/docs/messages/failed-to-find-server-action
+    at ignore-listed frames
+Error: Failed to find Server Action "x". This request might be from an older or newer deployment.
+Read more: https://nextjs.org/docs/messages/failed-to-find-server-action
+    at ignore-listed frames

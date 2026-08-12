@@ -10,13 +10,8 @@ import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
-// Mock data for donations
-const mockDonations = [
-  { id: 'DON-1029', donorName: 'Rahim Uddin', amount: 5000, method: 'bKash', status: 'Approved', date: new Date().toISOString(), isRecurring: false }, // Today
-  { id: 'DON-1028', donorName: 'Korim Hossain', amount: 2000, method: 'Nagad', status: 'Approved', date: '2026-07-23T14:15:00Z', isRecurring: true },
-  { id: 'DON-1027', donorName: 'Jamal Bhuiyan', amount: 1500, method: 'Card', status: 'Failed', date: '2026-07-23T09:45:00Z', isRecurring: false },
-  { id: 'DON-1026', donorName: 'Unknown Donor', amount: 500, method: 'bKash', status: 'Pending', date: '2026-07-22T18:20:00Z', isRecurring: false },
-];
+import { collection, query, onSnapshot, orderBy } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 
 export default function DonationsPage() {
   const [activeTab, setActiveTab] = useState('all');
@@ -24,9 +19,45 @@ export default function DonationsPage() {
   const [summaryFilter, setSummaryFilter] = useState('all');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [donations, setDonations] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const filteredDonations = mockDonations.filter(d => {
+  React.useEffect(() => {
+    const q = query(collection(db, 'donations')); // Removed orderBy to include documents missing the 'date' field
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const data = snapshot.docs.map(doc => {
+        const d = doc.data();
+        let dateStr = new Date().toISOString();
+        if (d.date) {
+          dateStr = typeof d.date.toDate === 'function' ? d.date.toDate().toISOString() : new Date(d.date).toISOString();
+        } else if (d.createdAt) {
+          dateStr = typeof d.createdAt.toDate === 'function' ? d.createdAt.toDate().toISOString() : new Date(d.createdAt).toISOString();
+        }
+        return {
+          id: doc.id,
+          ...d,
+          date: dateStr,
+          amount: Number(d.amount) || 0,
+          status: (d.status === 'success' ? 'Approved' : d.status) || 'Pending',
+          donorName: d.donorName || d.name || 'Unknown Donor',
+          mobile: d.mobile || 'N/A',
+          method: d.method || 'EPS Payment',
+          isRecurring: !!d.isRecurring
+        };
+      });
+      // Sort in memory by date descending
+      data.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      
+      setDonations(data);
+      setLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const filteredDonations = donations.filter(d => {
     if (activeTab === 'approved' && d.status !== 'Approved') return false;
+    if (activeTab === 'pending' && d.status !== 'pending') return false;
+    if (activeTab === 'cancelled' && d.status !== 'cancelled') return false;
     if (activeTab === 'failed' && d.status !== 'Failed') return false;
     if (activeTab === 'recurring' && !d.isRecurring) return false;
     
@@ -56,8 +87,54 @@ export default function DonationsPage() {
   };
 
   const handleDownloadReceipt = (id: string) => {
-    // Logic for PDF generation using jspdf will go here
-    alert(`Generating PDF receipt for ${id}...`);
+    const donation = filteredDonations.find(d => d.id === id);
+    if (!donation) return;
+
+    const doc = new jsPDF();
+    
+    // Add Header
+    doc.setFontSize(22);
+    doc.setTextColor(41, 128, 185); // A nice blue color
+    doc.text('Jubokantha Society', 105, 20, { align: 'center' });
+    
+    doc.setFontSize(14);
+    doc.setTextColor(100);
+    doc.text('Donation Receipt', 105, 30, { align: 'center' });
+    
+    // Add line separator
+    doc.setLineWidth(0.5);
+    doc.setDrawColor(200);
+    doc.line(20, 35, 190, 35);
+    
+    // Add Receipt Details
+    doc.setFontSize(12);
+    doc.setTextColor(50);
+    
+    const startY = 50;
+    const lineSpacing = 10;
+    
+    doc.text(`Receipt No: ${donation.id}`, 20, startY);
+    doc.text(`Date: ${format(new Date(donation.date), 'dd MMM yyyy, hh:mm a')}`, 20, startY + lineSpacing);
+    
+    doc.text(`Donor Name: ${donation.donorName}`, 20, startY + lineSpacing * 2);
+    doc.text(`Payment Method: ${donation.method}`, 20, startY + lineSpacing * 3);
+    doc.text(`Status: ${donation.status}`, 20, startY + lineSpacing * 4);
+    if (donation.fund) {
+      doc.text(`Fund: ${donation.fund}`, 20, startY + lineSpacing * 5);
+    }
+    
+    // Add Amount
+    doc.setFontSize(16);
+    doc.setTextColor(40);
+    doc.text(`Amount: ${donation.amount} BDT`, 20, startY + lineSpacing * 7);
+    
+    // Add Footer
+    doc.setFontSize(10);
+    doc.setTextColor(150);
+    doc.text('Thank you for your generous donation!', 105, 270, { align: 'center' });
+    doc.text('This is an electronically generated receipt and does not require a signature.', 105, 276, { align: 'center' });
+    
+    doc.save(`receipt_${donation.id}.pdf`);
   };
 
   const totalCollected = useMemo(() => {
@@ -71,6 +148,7 @@ export default function DonationsPage() {
     const exportData = filteredDonations.map(d => ({
       'Donation ID': d.id,
       'Donor Name': d.donorName,
+      'Mobile Number': d.mobile,
       'Amount (BDT)': d.amount,
       'Method': d.method,
       'Date': format(new Date(d.date), 'dd MMM yyyy, hh:mm a'),
@@ -81,6 +159,7 @@ export default function DonationsPage() {
     exportData.push({
       'Donation ID': `Total Collected (${summaryFilter === 'custom' ? 'Custom Date' : summaryFilter})`,
       'Donor Name': '',
+      'Mobile Number': '',
       'Amount (BDT)': totalCollected,
       'Method': '',
       'Date': '',
@@ -102,17 +181,18 @@ export default function DonationsPage() {
     const doc = new jsPDF();
     doc.text(`Jubokantha Society - Donations Report`, 14, 15);
     
-    const tableColumn = ["Donation ID", "Donor Name", "Amount (BDT)", "Method", "Date", "Status"];
+    const tableColumn = ["Donation ID", "Donor Name", "Mobile", "Amount (BDT)", "Method", "Date", "Status"];
     const tableRows = filteredDonations.map(d => [
       d.id,
       d.donorName,
+      d.mobile,
       d.amount.toString(),
       d.method,
       format(new Date(d.date), 'dd MMM yyyy'),
       d.status
     ]);
 
-    tableRows.push([`Total Collected (${summaryFilter === 'custom' ? 'Custom Date' : summaryFilter})`, "", totalCollected.toString(), "", "", ""]);
+    tableRows.push([`Total Collected (${summaryFilter === 'custom' ? 'Custom Date' : summaryFilter})`, "", "", totalCollected.toString(), "", "", ""]);
 
     autoTable(doc, {
       head: [tableColumn],
@@ -195,8 +275,10 @@ export default function DonationsPage() {
                 <div className="flex flex-wrap gap-2">
                   <Button variant={activeTab === 'all' ? 'default' : 'outline'} onClick={() => setActiveTab('all')} size="sm">All</Button>
                   <Button variant={activeTab === 'approved' ? 'default' : 'outline'} onClick={() => setActiveTab('approved')} size="sm">Approved</Button>
+                  <Button variant={activeTab === 'pending' ? 'default' : 'outline'} onClick={() => setActiveTab('pending')} size="sm">Pending</Button>
                   <Button variant={activeTab === 'recurring' ? 'default' : 'outline'} onClick={() => setActiveTab('recurring')} size="sm">Recurring</Button>
                   <Button variant={activeTab === 'failed' ? 'default' : 'outline'} onClick={() => setActiveTab('failed')} size="sm">Failed</Button>
+                  <Button variant={activeTab === 'cancelled' ? 'default' : 'outline'} onClick={() => setActiveTab('cancelled')} size="sm">Cancelled</Button>
                 </div>
                 <div className="relative w-full sm:w-64">
                   <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
@@ -217,6 +299,7 @@ export default function DonationsPage() {
                     <tr>
                       <th className="px-4 py-3">Donation ID</th>
                       <th className="px-4 py-3">Donor Name</th>
+                      <th className="px-4 py-3">Mobile</th>
                       <th className="px-4 py-3">Amount</th>
                       <th className="px-4 py-3">Method</th>
                       <th className="px-4 py-3">Date</th>
@@ -225,35 +308,43 @@ export default function DonationsPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredDonations.map((donation) => (
-                      <tr key={donation.id} className="border-b hover:bg-gray-50">
-                        <td className="px-4 py-3 font-medium text-gray-900">{donation.id}</td>
-                        <td className="px-4 py-3">
-                          {donation.donorName}
-                          {donation.isRecurring && <span className="ml-2 inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">Recurring</span>}
-                        </td>
-                        <td className="px-4 py-3 font-semibold">৳{donation.amount}</td>
-                        <td className="px-4 py-3">{donation.method}</td>
-                        <td className="px-4 py-3">{format(new Date(donation.date), 'dd MMM yyyy, hh:mm a')}</td>
-                        <td className="px-4 py-3 flex items-center">
-                          {getStatusIcon(donation.status)}
-                          {donation.status}
-                        </td>
-                        <td className="px-4 py-3 text-right">
-                          {donation.status === 'Approved' && (
-                            <Button variant="outline" size="sm" onClick={() => handleDownloadReceipt(donation.id)}>
-                              Receipt
-                            </Button>
-                          )}
+                    {loading ? (
+                      <tr>
+                        <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
+                          Loading donations...
                         </td>
                       </tr>
-                    ))}
-                    {filteredDonations.length === 0 && (
+                    ) : filteredDonations.length === 0 ? (
                       <tr>
                         <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
                           No donations found.
                         </td>
                       </tr>
+                    ) : (
+                      filteredDonations.map((donation) => (
+                        <tr key={donation.id} className="border-b hover:bg-gray-50">
+                          <td className="px-4 py-3 font-medium text-gray-900">{donation.id}</td>
+                          <td className="px-4 py-3">
+                            {donation.donorName}
+                            {donation.isRecurring && <span className="ml-2 inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">Recurring</span>}
+                          </td>
+                          <td className="px-4 py-3">{donation.mobile}</td>
+                          <td className="px-4 py-3 font-semibold">৳{donation.amount}</td>
+                          <td className="px-4 py-3">{donation.method}</td>
+                          <td className="px-4 py-3">{format(new Date(donation.date), 'dd MMM yyyy, hh:mm a')}</td>
+                          <td className="px-4 py-3 flex items-center">
+                            {getStatusIcon(donation.status)}
+                            {donation.status}
+                          </td>
+                          <td className="px-4 py-3 text-right">
+                            {donation.status === 'Approved' && (
+                              <Button variant="outline" size="sm" onClick={() => handleDownloadReceipt(donation.id)}>
+                                Receipt
+                              </Button>
+                            )}
+                          </td>
+                        </tr>
+                      ))
                     )}
                   </tbody>
                 </table>

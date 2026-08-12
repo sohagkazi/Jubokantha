@@ -8,18 +8,16 @@ import { Label } from "@/components/ui/label";
 import { Search, Plus, Shield, CheckCircle2, XCircle, MoreVertical, User, Phone, Lock } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const mockUsers = [
-  { id: '1', name: 'Hasib Rahman', email: 'hasib.admin@jubokantha.org', role: 'Super Admin', status: 'Active' },
-  { id: '2', name: 'Tanvir Ahmed', email: 'tanvir@jubokantha.org', role: 'Admin', status: 'Active' },
-  { id: '3', name: 'Sumaiya Akter', email: 'sumaiya@jubokantha.org', role: 'Manager', status: 'Active' },
-  { id: '4', name: 'Rafiqul Islam', email: 'rafiqul@jubokantha.org', role: 'Supervisor', status: 'Inactive' },
-  { id: '5', name: 'Kazi Noman', email: 'noman@jubokantha.org', role: 'Accountant', status: 'Active' },
-];
+import { collection, query, onSnapshot, doc, setDoc, orderBy } from 'firebase/firestore';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { db, secondaryAuth } from '@/lib/firebase';
 
 export default function UserManagementPage() {
   const [search, setSearch] = useState('');
-  const [users, setUsers] = useState(mockUsers);
+  const [users, setUsers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   // Form State
   const [formData, setFormData] = useState({
@@ -28,6 +26,23 @@ export default function UserManagementPage() {
     password: '',
     role: 'Admin'
   });
+
+  React.useEffect(() => {
+    const q = query(collection(db, 'users'), orderBy('name', 'asc'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const data = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        name: doc.data().name || 'Unknown',
+        email: doc.data().email || 'Unknown',
+        role: doc.data().role || 'User',
+        status: doc.data().status || 'Active'
+      }));
+      setUsers(data);
+      setLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
 
   const filteredUsers = users.filter(u => 
     u.name.toLowerCase().includes(search.toLowerCase()) || 
@@ -40,21 +55,32 @@ export default function UserManagementPage() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleAddUser = (e: React.FormEvent) => {
+  const handleAddUser = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Generate a mock ID
-    const newUser = {
-      id: Math.random().toString(36).substr(2, 9),
-      name: formData.name,
-      email: formData.email,
-      role: formData.role,
-      status: 'Active'
-    };
-    
-    setUsers([...users, newUser]);
-    setIsModalOpen(false);
-    setFormData({ name: '', email: '', password: '', role: 'Admin' });
-    alert("User created successfully! (Mock Data)");
+    setIsSubmitting(true);
+    try {
+      // Create user without logging out current admin
+      const userCredential = await createUserWithEmailAndPassword(secondaryAuth, formData.email, formData.password);
+      const newUserId = userCredential.user.uid;
+      
+      // Save details to users collection
+      await setDoc(doc(db, 'users', newUserId), {
+        name: formData.name,
+        email: formData.email,
+        role: formData.role,
+        status: 'Active',
+        createdAt: new Date().toISOString()
+      });
+
+      setIsModalOpen(false);
+      setFormData({ name: '', email: '', password: '', role: 'Admin' });
+      alert("User created successfully!");
+    } catch (error: any) {
+      console.error("Error creating user:", error);
+      alert(`Failed to create user: ${error.message}`);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const getRoleBadgeColor = (role: string) => {
@@ -63,6 +89,7 @@ export default function UserManagementPage() {
       case 'Admin': return 'bg-red-100 text-red-800 border-red-200';
       case 'Manager': return 'bg-blue-100 text-blue-800 border-blue-200';
       case 'Supervisor': return 'bg-orange-100 text-orange-800 border-orange-200';
+      case 'Branch Supervisor': return 'bg-indigo-100 text-indigo-800 border-indigo-200';
       case 'Accountant': return 'bg-green-100 text-green-800 border-green-200';
       default: return 'bg-gray-100 text-gray-800 border-gray-200';
     }
@@ -109,40 +136,47 @@ export default function UserManagementPage() {
                 </tr>
               </thead>
               <tbody>
-                {filteredUsers.map((user) => (
-                  <tr key={user.id} className="border-b hover:bg-gray-50">
-                    <td className="px-4 py-3 font-medium text-gray-900 flex items-center gap-3">
-                      <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
-                        {user.name.charAt(0)}
-                      </div>
-                      {user.name}
-                    </td>
-                    <td className="px-4 py-3 text-gray-600">{user.email}</td>
-                    <td className="px-4 py-3">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getRoleBadgeColor(user.role)}`}>
-                        {user.role === 'Super Admin' && <Shield className="w-3 h-3 mr-1" />}
-                        {user.role}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className={`inline-flex items-center ${user.status === 'Active' ? 'text-green-600' : 'text-gray-500'}`}>
-                        {user.status === 'Active' ? <CheckCircle2 className="w-4 h-4 mr-1" /> : <XCircle className="w-4 h-4 mr-1" />}
-                        {user.status}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-500 hover:text-gray-900">
-                        <MoreVertical className="h-4 w-4" />
-                      </Button>
+                {loading ? (
+                  <tr>
+                    <td colSpan={5} className="px-4 py-8 text-center text-gray-500">
+                      Loading users...
                     </td>
                   </tr>
-                ))}
-                {filteredUsers.length === 0 && (
+                ) : filteredUsers.length === 0 ? (
                   <tr>
                     <td colSpan={5} className="px-4 py-8 text-center text-gray-500">
                       No users found.
                     </td>
                   </tr>
+                ) : (
+                  filteredUsers.map((user) => (
+                    <tr key={user.id} className="border-b hover:bg-gray-50">
+                      <td className="px-4 py-3 font-medium text-gray-900 flex items-center gap-3">
+                        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
+                          {user.name.charAt(0)}
+                        </div>
+                        {user.name}
+                      </td>
+                      <td className="px-4 py-3 text-gray-600">{user.email}</td>
+                      <td className="px-4 py-3">
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getRoleBadgeColor(user.role)}`}>
+                          {user.role === 'Super Admin' && <Shield className="w-3 h-3 mr-1" />}
+                          {user.role}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className={`inline-flex items-center ${user.status === 'Active' ? 'text-green-600' : 'text-gray-500'}`}>
+                          {user.status === 'Active' ? <CheckCircle2 className="w-4 h-4 mr-1" /> : <XCircle className="w-4 h-4 mr-1" />}
+                          {user.status}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-500 hover:text-gray-900">
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </td>
+                    </tr>
+                  ))
                 )}
               </tbody>
             </table>
@@ -257,6 +291,7 @@ export default function UserManagementPage() {
                           <option value="Admin">Admin</option>
                           <option value="Manager">Manager</option>
                           <option value="Supervisor">Supervisor</option>
+                          <option value="Branch Supervisor">Branch Supervisor</option>
                           <option value="Accountant">Accountant</option>
                         </select>
                         <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
@@ -279,9 +314,10 @@ export default function UserManagementPage() {
                     </Button>
                     <Button 
                       type="submit" 
+                      disabled={isSubmitting}
                       className="bg-primary text-white rounded-xl px-6 h-11 font-medium hover:bg-primary/90 shadow-md hover:shadow-lg transition-all"
                     >
-                      Create User
+                      {isSubmitting ? "Creating..." : "Create User"}
                     </Button>
                   </div>
                 </form>
