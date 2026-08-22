@@ -1,22 +1,32 @@
 "use client"
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Search, Plus, CheckCircle2, XCircle, MoreVertical, User, Phone, MapPin, Calendar, FileText, Users, Home } from 'lucide-react';
+import { Search, Plus, CheckCircle2, XCircle, MoreVertical, User, Phone, MapPin, Calendar, FileText, Users, Home, Edit, Trash2, Upload, AlertTriangle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-import { collection, query, onSnapshot, addDoc, serverTimestamp, orderBy } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { collection, query, onSnapshot, addDoc, updateDoc, deleteDoc, doc, serverTimestamp, orderBy, getDoc } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
+import { db, app } from '@/lib/firebase';
+import * as XLSX from 'xlsx';
 
 export default function MembersPage() {
   const [search, setSearch] = useState('');
   const [members, setMembers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [hasAccess, setHasAccess] = useState<boolean>(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   // Form State
   const initialFormState = {
@@ -67,13 +77,51 @@ export default function MembersPage() {
   const [formData, setFormData] = useState(initialFormState);
 
   useEffect(() => {
+    const auth = getAuth(app);
+    const unsubscribeAuth = auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        setCurrentUser(user);
+        try {
+          let role = null;
+          let docRef = doc(db, "users", user.uid);
+          let docSnap = await getDoc(docRef);
+          
+          if (docSnap.exists()) {
+            role = docSnap.data().role;
+          } else {
+            docRef = doc(db, "staff", user.uid);
+            docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+              role = docSnap.data().role;
+            }
+          }
+
+          if (role) {
+            const cleanRole = role.trim();
+            const allowedRoles = ["Super Admin", "Admin"];
+            if (allowedRoles.includes(cleanRole)) {
+              setHasAccess(true);
+            } else {
+              setHasAccess(false);
+            }
+          }
+        } catch (error) {
+          console.error("Error checking role:", error);
+          setHasAccess(false);
+        }
+      } else {
+        setCurrentUser(null);
+        setHasAccess(false);
+      }
+    });
+
     const q = query(collection(db, 'members'), orderBy('createdAt', 'desc'));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
+    const unsubscribeMembers = onSnapshot(q, (snapshot) => {
       const data = snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data(),
         name: doc.data().name || 'Unknown',
-        mobile: doc.data().mobile || doc.data().phone || 'N/A', // fallback to phone if old data
+        mobile: doc.data().mobile || doc.data().phone || 'N/A', 
         presentAddress: doc.data().presentAddress || doc.data().address || 'N/A',
         date: doc.data().date || doc.data().joinDate || 'N/A',
         status: doc.data().status || 'Active'
@@ -81,44 +129,151 @@ export default function MembersPage() {
       setMembers(data);
       setLoading(false);
     });
-    return () => unsubscribe();
+    
+    return () => {
+      unsubscribeAuth();
+      unsubscribeMembers();
+    };
   }, []);
 
   const filteredMembers = members.filter(m => 
-    m.name.toLowerCase().includes(search.toLowerCase()) || 
-    m.mobile.toLowerCase().includes(search.toLowerCase())
+    m.name?.toLowerCase().includes(search.toLowerCase()) || 
+    m.mobile?.toLowerCase().includes(search.toLowerCase())
   );
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
     
     if (type === 'radio') {
-       // For radio buttons, we just set the value
        setFormData(prev => ({ ...prev, [name]: value }));
     } else {
        setFormData(prev => ({ ...prev, [name]: value }));
     }
   };
 
-  const handleAddMember = async (e: React.FormEvent) => {
+  const getAddedBy = () => {
+    if (!currentUser) return null;
+    return {
+      uid: currentUser.uid,
+      email: currentUser.email,
+      name: currentUser.displayName || currentUser.email?.split('@')[0] || 'Admin',
+      date: new Date().toISOString()
+    };
+  };
+
+  const openAddModal = () => {
+    setEditingId(null);
+    setFormData(initialFormState);
+    setIsModalOpen(true);
+  };
+
+  const openEditModal = (member: any) => {
+    setEditingId(member.id);
+    setFormData({
+      ...initialFormState,
+      ...member
+    });
+    setIsModalOpen(true);
+  };
+
+  const openDeleteModal = (id: string) => {
+    setDeletingId(id);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      await addDoc(collection(db, 'members'), {
-        ...formData,
-        status: 'Active',
-        createdAt: serverTimestamp()
-      });
+      if (editingId) {
+        await updateDoc(doc(db, 'members', editingId), {
+          ...formData,
+          updatedAt: serverTimestamp(),
+          updatedBy: getAddedBy()
+        });
+        alert("সদস্য সফলভাবে আপডেট করা হয়েছে!");
+      } else {
+        await addDoc(collection(db, 'members'), {
+          ...formData,
+          status: 'Active',
+          createdAt: serverTimestamp(),
+          addedBy: getAddedBy()
+        });
+        alert("সদস্য সফলভাবে যুক্ত করা হয়েছে!");
+      }
 
       setIsModalOpen(false);
       setFormData(initialFormState);
-      alert("সদস্য সফলভাবে যুক্ত করা হয়েছে!");
+      setEditingId(null);
     } catch (error: any) {
-      console.error("Error creating member:", error);
-      alert(`Failed to create member: ${error.message}`);
+      console.error("Error saving member:", error);
+      alert(`Failed to save member: ${error.message}`);
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleDelete = async () => {
+    if (!deletingId) return;
+    setIsSubmitting(true);
+    try {
+      await deleteDoc(doc(db, 'members', deletingId));
+      setIsDeleteModalOpen(false);
+      setDeletingId(null);
+    } catch (error: any) {
+      alert("Failed to delete: " + error.message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleImportExcel = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsSubmitting(true);
+    const reader = new FileReader();
+    reader.onload = async (evt) => {
+      try {
+        const bstr = evt.target?.result;
+        const wb = XLSX.read(bstr, { type: 'binary' });
+        const wsname = wb.SheetNames[0];
+        const ws = wb.Sheets[wsname];
+        const data = XLSX.utils.sheet_to_json(ws);
+        
+        let importedCount = 0;
+        for (const row of data as any[]) {
+          const nameStr = row['নাম'] || row['Name'] || row['name'] || '';
+          if (!nameStr) continue;
+          
+          const newMember = {
+            ...initialFormState,
+            name: nameStr,
+            mobile: row['মোবাইল'] || row['Mobile'] || row['mobile'] || row['Phone'] || row['phone'] || '',
+            presentAddress: row['ঠিকানা'] || row['Address'] || row['address'] || '',
+            status: 'Active',
+            createdAt: serverTimestamp(),
+            addedBy: getAddedBy()
+          };
+          
+          await addDoc(collection(db, 'members'), newMember);
+          importedCount++;
+        }
+        
+        alert(`Successfully imported ${importedCount} members!`);
+      } catch (error: any) {
+        console.error("Error parsing excel:", error);
+        alert(`Error importing data: ${error.message}`);
+      } finally {
+        setIsSubmitting(false);
+        if (fileInputRef.current) fileInputRef.current.value = '';
+      }
+    };
+    reader.onerror = () => {
+        alert("Failed to read file!");
+        setIsSubmitting(false);
+    };
+    reader.readAsBinaryString(file);
   };
 
   return (
@@ -128,9 +283,24 @@ export default function MembersPage() {
           <h2 className="text-2xl font-bold tracking-tight text-gray-900">সদস্য ব্যবস্থাপনা (Member Management)</h2>
           <p className="text-muted-foreground">Manage branch members and their information.</p>
         </div>
-        <Button onClick={() => setIsModalOpen(true)} className="bg-primary text-white">
-          <Plus className="mr-2 h-4 w-4" /> নতুন সদস্য যোগ করুন
-        </Button>
+        
+        {hasAccess && (
+          <div className="flex gap-2">
+            <input 
+              type="file" 
+              accept=".xlsx, .xls" 
+              onChange={handleImportExcel} 
+              ref={fileInputRef} 
+              className="hidden" 
+            />
+            <Button onClick={() => fileInputRef.current?.click()} variant="outline" className="border-primary text-primary hover:bg-primary/10">
+              <Upload className="mr-2 h-4 w-4" /> Import Excel
+            </Button>
+            <Button onClick={openAddModal} className="bg-primary text-white">
+              <Plus className="mr-2 h-4 w-4" /> নতুন সদস্য যোগ করুন
+            </Button>
+          </div>
+        )}
       </div>
 
       <Card>
@@ -158,20 +328,21 @@ export default function MembersPage() {
                   <th className="px-4 py-3">মোবাইল (Mobile)</th>
                   <th className="px-4 py-3">ঠিকানা (Address)</th>
                   <th className="px-4 py-3">তারিখ (Date)</th>
+                  <th className="px-4 py-3">Added By</th>
                   <th className="px-4 py-3">স্ট্যাটাস (Status)</th>
-                  <th className="px-4 py-3 text-right">Actions</th>
+                  {hasAccess && <th className="px-4 py-3 text-right">Actions</th>}
                 </tr>
               </thead>
               <tbody>
                 {loading ? (
                   <tr>
-                    <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
+                    <td colSpan={hasAccess ? 7 : 6} className="px-4 py-8 text-center text-gray-500">
                       Loading members...
                     </td>
                   </tr>
                 ) : filteredMembers.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
+                    <td colSpan={hasAccess ? 7 : 6} className="px-4 py-8 text-center text-gray-500">
                       No members found.
                     </td>
                   </tr>
@@ -187,17 +358,33 @@ export default function MembersPage() {
                       <td className="px-4 py-3 text-gray-600">{member.mobile}</td>
                       <td className="px-4 py-3 text-gray-600">{member.presentAddress}</td>
                       <td className="px-4 py-3 text-gray-600">{member.date}</td>
+                      <td className="px-4 py-3 text-gray-600">
+                        {member.addedBy ? (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                                {member.addedBy.name || member.addedBy.email}
+                            </span>
+                        ) : (
+                            <span className="text-gray-400 text-xs">N/A</span>
+                        )}
+                      </td>
                       <td className="px-4 py-3">
                         <span className={`inline-flex items-center ${member.status === 'Active' ? 'text-green-600' : 'text-gray-500'}`}>
                           {member.status === 'Active' ? <CheckCircle2 className="w-4 h-4 mr-1" /> : <XCircle className="w-4 h-4 mr-1" />}
                           {member.status}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-right">
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-500 hover:text-gray-900">
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </td>
+                      {hasAccess && (
+                        <td className="px-4 py-3 text-right">
+                          <div className="flex justify-end gap-2">
+                            <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50" onClick={() => openEditModal(member)}>
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50" onClick={() => openDeleteModal(member.id)}>
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </td>
+                      )}
                     </tr>
                   ))
                 )}
@@ -207,7 +394,7 @@ export default function MembersPage() {
         </CardContent>
       </Card>
 
-      {/* Add Member Modal */}
+      {/* Add/Edit Member Modal */}
       <AnimatePresence>
         {isModalOpen && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
@@ -229,7 +416,7 @@ export default function MembersPage() {
               <div className="bg-gradient-to-r from-primary to-[#0f6e36] px-6 py-4 flex items-center justify-between shrink-0">
                 <h3 className="text-xl font-bold text-white flex items-center gap-2">
                   <User className="h-5 w-5" />
-                  সদস্য ভর্তি ফরম
+                  {editingId ? "সদস্য তথ্য আপডেট (Edit Member)" : "সদস্য ভর্তি ফরম (Add Member)"}
                 </h3>
                 <button 
                   onClick={() => setIsModalOpen(false)}
@@ -240,7 +427,7 @@ export default function MembersPage() {
               </div>
               
               <div className="p-6 sm:p-8 overflow-y-auto flex-1">
-                <form id="memberForm" onSubmit={handleAddMember} className="space-y-8">
+                <form id="memberForm" onSubmit={handleSubmit} className="space-y-8">
                   
                   {/* Section: Basic Top Info */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-6 border-b border-gray-100">
@@ -466,8 +653,55 @@ export default function MembersPage() {
                   disabled={isSubmitting}
                   className="bg-primary text-white rounded-xl px-8 h-11 font-medium hover:bg-primary/90 shadow-md hover:shadow-lg transition-all"
                 >
-                  {isSubmitting ? "সংরক্ষণ করা হচ্ছে..." : "সদস্য যোগ করুন"}
+                  {isSubmitting ? "সংরক্ষণ করা হচ্ছে..." : editingId ? "আপডেট করুন" : "সদস্য যোগ করুন"}
                 </Button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Delete Confirm Modal */}
+      <AnimatePresence>
+        {isDeleteModalOpen && deletingId && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              onClick={() => !isSubmitting && setIsDeleteModalOpen(false)}
+              className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ type: "spring", duration: 0.4 }}
+              className="relative w-full max-w-sm bg-white rounded-2xl shadow-2xl overflow-hidden"
+            >
+              <div className="p-6 text-center">
+                <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <AlertTriangle className="h-8 w-8 text-red-600" />
+                </div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">Delete Member?</h3>
+                <p className="text-gray-500 text-sm mb-1">
+                  This action cannot be undone.
+                </p>
+                <div className="flex gap-3 mt-6">
+                  <Button
+                    variant="outline"
+                    className="flex-1 rounded-xl h-11 font-medium"
+                    onClick={() => setIsDeleteModalOpen(false)}
+                    disabled={isSubmitting}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    className="flex-1 bg-red-600 hover:bg-red-700 text-white rounded-xl h-11 font-medium shadow-md"
+                    onClick={handleDelete}
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? "Deleting..." : "Yes, Delete"}
+                  </Button>
+                </div>
               </div>
             </motion.div>
           </div>

@@ -1,6 +1,6 @@
 "use client"
 
-import { Users, HeartHandshake, Smile, Sprout } from "lucide-react"
+import { Users, HeartHandshake, Smile, HandCoins } from "lucide-react"
 import { Translate } from "@/components/Translate"
 
 export function StatsBar() {
@@ -21,9 +21,9 @@ export function StatsBar() {
       label: "সহায়তা প্রাপ্ত মানুষ",
     },
     {
-      icon: <Sprout className="w-10 h-10 text-[#2e7d32]" />,
+      icon: <HandCoins className="w-10 h-10 text-[#2e7d32]" />,
       count: "3000+",
-      label: "গাছ রোপণ",
+      label: "ভাতা প্রাপ্ত মানুষ",
     },
   ]
 
