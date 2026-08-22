@@ -1,0 +1,16 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/multimedia/layout,_N_T_/multimedia/news/layout,_N_T_/multimedia/news/page,_N_T_/multimedia/news"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/multimedia/news/__PAGE__",
+    "/multimedia/news",
+    "/multimedia",
+    "/_index",
+    "/_head"
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/admin/layout,_N_T_/admin/committee/layout,_N_T_/admin/committee/page,_N_T_/admin/committee"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/admin/committee/__PAGE__",
+    "/admin/committee",
+    "/admin",
+    "/_index",
+    "/_head"
+  ]
+}

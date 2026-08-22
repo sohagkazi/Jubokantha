@@ -1,17 +1,18 @@
 "use client"
 import { useState, useEffect } from "react"
 import Image from "next/image"
-import { collection, query, orderBy, limit, onSnapshot } from "firebase/firestore"
 import { db } from "@/lib/firebase"
 import { Translate } from "@/components/Translate"
+import { Button } from "@/components/ui/button"
 
 export function GallerySection() {
   const [images, setImages] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [showAll, setShowAll] = useState(false)
 
   useEffect(() => {
-    import('firebase/firestore').then(({ collection, query, orderBy, limit, onSnapshot }) => {
-       const q = query(collection(db, 'gallery'), orderBy('createdAt', 'desc'), limit(12));
+    import('firebase/firestore').then(({ collection, query, orderBy, onSnapshot }) => {
+       const q = query(collection(db, 'gallery'), orderBy('createdAt', 'desc'));
        const unsubscribe = onSnapshot(q, (snapshot) => {
          const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
          setImages(data);
@@ -32,7 +33,7 @@ export function GallerySection() {
     );
   }
   
-  // if (images.length === 0) return null;
+  const visibleImages = showAll ? images : images.slice(0, 8);
 
   return (
     <section className="py-16 bg-white w-full">
@@ -47,24 +48,38 @@ export function GallerySection() {
              <Translate>গ্যালারিতে এখনো কোনো ছবি যুক্ত করা হয়নি।</Translate>
            </div>
          ) : (
-           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-             {images.map((img) => (
-               <div key={img.id} className="relative h-48 sm:h-64 rounded-xl overflow-hidden shadow-sm group bg-gray-100">
-                  <Image 
-                    src={img.imageUrl} 
-                    alt={img.title || "Gallery Image"}
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-110"
-                    unoptimized={true}
-                  />
-                  {img.title && (
-                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <p className="text-white text-sm font-medium line-clamp-2"><Translate>{img.title}</Translate></p>
-                    </div>
-                  )}
+           <>
+             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+               {visibleImages.map((img) => (
+                 <div key={img.id} className="relative h-48 sm:h-64 rounded-xl overflow-hidden shadow-sm group bg-gray-100">
+                    <Image 
+                      src={img.imageUrl} 
+                      alt={img.title || "Gallery Image"}
+                      fill
+                      className="object-cover transition-transform duration-500 group-hover:scale-110"
+                      unoptimized={true}
+                    />
+                    {img.title && (
+                      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <p className="text-white text-sm font-medium line-clamp-2"><Translate>{img.title}</Translate></p>
+                      </div>
+                    )}
+                 </div>
+               ))}
+             </div>
+             
+             {!showAll && images.length > 8 && (
+               <div className="flex justify-center mt-10">
+                 <Button 
+                   onClick={() => setShowAll(true)}
+                   variant="outline" 
+                   className="text-primary border-2 border-primary hover:bg-primary hover:text-white px-10 py-6 rounded-full text-lg font-bold shadow-sm transition-all duration-300 hover:shadow-lg"
+                 >
+                   <Translate>আরও দেখুন</Translate>
+                 </Button>
                </div>
-             ))}
-           </div>
+             )}
+           </>
          )}
       </div>
     </section>
